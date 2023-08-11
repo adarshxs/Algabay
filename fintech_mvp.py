@@ -32,42 +32,58 @@ def ask_claude(stock_info, query):
 def fintech_app():
     st.title("Algabay AI")
 
-    # List of famous Indian stock companies
-    stocks = [
-        "Reliance Industries",
-        "Tata Consultancy Services",
-        "HDFC Bank",
-        "Infosys",
-        "Hindustan Unilever",
-        "ICICI Bank",
-        "State Bank of India",
-        "Bajaj Finance",
-        "Kotak Mahindra Bank",
-        "Bharti Airtel",
-    ]
+    # Dictionary of famous Indian stock companies with their symbols
+    stocks_with_symbols = {
+        "Reliance Industries": "RELIANCE",
+        "Tata Consultancy Services": "TCS",
+        "HDFC Bank": "HDFCBANK",
+        "Infosys": "INFY",
+        "Hindustan Unilever": "HUL",
+        "ICICI Bank": "ICICIBANK",
+        "State Bank of India": "SBIN",
+        "Bajaj Finance": "BAJFINANCE",
+        "Kotak Mahindra Bank": "KOTAKBANK",
+        "Bharti Airtel": "BHARTIARTL",
+    }
 
-    # Number of columns
-    num_columns = 5
+    # Dropdown for stock selection
+    selected_stock = st.selectbox(
+        'Select a stock:',
+        options=list(stocks_with_symbols.keys())
+    )
 
-    # Display buttons for stock selection in grid layout
-    if "selected_stock" not in st.session_state:
-        st.session_state.selected_stock = None
+    if selected_stock:
+        st.session_state.selected_stock = selected_stock
+        stock_symbol = stocks_with_symbols[selected_stock]  # Retrieve the symbol for the selected stock
+    else:
+        stock_symbol = "NZDCAD" 
+    tradingview_widget_code = f"""
+        <div class="tradingview-widget-container">
+            <div id="tradingview_{stock_symbol}"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+            new TradingView.widget(
+                {{
+                    "container_id": "tradingview_{stock_symbol}",
+                    "symbol": "{stock_symbol}",
+                    "interval": "D",
+                    "width": "100%",
+                    "height": "400",
+                    // Additional widget options
+                }}
+            );
+            </script>
+        </div>
+        """
+    components.html(tradingview_widget_code, height=450)
 
-    # Display buttons for stock selection in grid layout
-    for i in range(0, len(stocks), num_columns):
-        row_stocks = stocks[i:i + num_columns]
-        row_columns = st.columns(len(row_stocks))
-        for j, stock in enumerate(row_stocks):
-            if row_columns[j].button(stock):
-                st.session_state.selected_stock = stock
 
+    col1, col2 = st.columns(2)
     # Stock information to prepend to Claude's prompt
     stock_info = ""
     if st.session_state.selected_stock:  # Updated reference here
         stock_info = f"Information about following company: {st.session_state.selected_stock}. Strictly adhere to relevancy of the company and keep the answer short and precise."
 
-    # Create two columns
-    col1, col2, col3 = st.columns(3)
 
     # Display stock news in the left column
     with col1:
@@ -90,27 +106,8 @@ def fintech_app():
         if user_query:
             response = ask_claude(stock_info, user_query)
             st.write(response)
-    with col3:
-        stock_symbol = "NZDCAD"
-        tradingview_widget_code = f"""
-        <div class="tradingview-widget-container">
-            <div id="tradingview_{stock_symbol}"></div>
-            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
-            <script type="text/javascript">
-            new TradingView.widget(
-                {{
-                    "container_id": "tradingview_{stock_symbol}",
-                    "symbol": "{stock_symbol}",
-                    "interval": "D",
-                    "width": "100%",
-                    "height": "400",
-                    // Additional widget options
-                }}
-            );
-            </script>
-        </div>
-        """
-        components.html(tradingview_widget_code, height=450)
+    
+        
 
 if __name__ == "__main__":
     fintech_app()
