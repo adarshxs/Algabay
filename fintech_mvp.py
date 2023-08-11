@@ -35,15 +35,25 @@ def fintech_app():
     # Dictionary of famous Indian stock companies with their symbols
     stocks_with_symbols = {
         "Reliance Industries": "RELIANCE",
-        "Tata Consultancy Services": "TCS",
+        "Tata Consultancy Services (TCS)": "TCS",
         "HDFC Bank": "HDFCBANK",
         "Infosys": "INFY",
         "Hindustan Unilever": "HUL",
         "ICICI Bank": "ICICIBANK",
-        "State Bank of India": "SBIN",
-        "Bajaj Finance": "BAJFINANCE",
-        "Kotak Mahindra Bank": "KOTAKBANK",
         "Bharti Airtel": "BHARTIARTL",
+        "Kotak Mahindra Bank": "KOTAKBANK",
+        "Maruti Suzuki India": "MARUTI",
+        "State Bank of India": "SBIN",
+        "Housing Development Finance Corporation (HDFC)": "HDFC",
+        "ITC Limited": "ITC",
+        "Bajaj Finance": "BAJFINANCE",
+        "Asian Paints": "ASIANPAINT",
+        "Wipro": "WIPRO",
+        "Axis Bank": "AXISBANK",
+        "Larsen & Toubro (L&T)": "LT",
+        "Nestle India": "NESTLEIND",
+        "Mahindra & Mahindra": "M&M",
+        "Sun Pharmaceutical Industries": "SUNPHARMA",
     }
 
     # Dropdown for stock selection
