@@ -3,6 +3,7 @@ import requests
 from anthropic import Anthropic, HUMAN_PROMPT, AI_PROMPT
 import os
 from dotenv import load_dotenv
+import streamlit.components.v1 as components
 
 # Load the environment variables from the .env file
 load_dotenv()
@@ -66,7 +67,7 @@ def fintech_app():
         stock_info = f"Information about following company: {st.session_state.selected_stock}. Strictly adhere to relevancy of the company and keep the answer short and precise."
 
     # Create two columns
-    col1, col2 = st.columns(2)
+    col1, col2, col3 = st.columns(3)
 
     # Display stock news in the left column
     with col1:
@@ -89,7 +90,27 @@ def fintech_app():
         if user_query:
             response = ask_claude(stock_info, user_query)
             st.write(response)
-
+    with col3:
+        stock_symbol = "NZDCAD"
+        tradingview_widget_code = f"""
+        <div class="tradingview-widget-container">
+            <div id="tradingview_{stock_symbol}"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/tv.js"></script>
+            <script type="text/javascript">
+            new TradingView.widget(
+                {{
+                    "container_id": "tradingview_{stock_symbol}",
+                    "symbol": "{stock_symbol}",
+                    "interval": "D",
+                    "width": "100%",
+                    "height": "400",
+                    // Additional widget options
+                }}
+            );
+            </script>
+        </div>
+        """
+        components.html(tradingview_widget_code, height=450)
 
 if __name__ == "__main__":
     fintech_app()
