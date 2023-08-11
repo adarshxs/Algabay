@@ -112,7 +112,7 @@ def fintech_app():
     # AI Assistant Interaction in the right column
     with col2:
         st.subheader("Ask Algabay AI")
-        user_query = st.text_input("Type your question about the stock:")
+        user_query = st.text_input(f"Type your question about {stock_symbol}:")
         if user_query:
             response = ask_claude(stock_info, user_query)
             st.write(response)
