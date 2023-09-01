@@ -15,9 +15,15 @@ ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY")
 # Initialize Claude API with the loaded key
 anthropic = Anthropic(api_key=ANTHROPIC_API_KEY)
 
+st.set_page_config(
+    page_title="Algabay",
+    layout="wide",
+    page_icon="🧊",
+    initial_sidebar_state="expanded",
+)
 
 def get_stock_news(stock_name):
-    response = requests.get(f"https://newsapi.org/v2/everything?q={stock_name}&apiKey={NEWS_API_KEY}")
+    response = requests.get(f"https://newsapi.org/v2/everything?q={stock_name}+company&apiKey={NEWS_API_KEY}")
     return response.json()["articles"][:10]
 
 def ask_claude(stock_info, query):
@@ -30,12 +36,12 @@ def ask_claude(stock_info, query):
     return completion.completion
 
 def fintech_app():
+
     st.title("Algabay AI")
     Trading_view_ticker_tape = """
     <!-- TradingView Widget BEGIN -->
     <div class="tradingview-widget-container">
     <div class="tradingview-widget-container__widget"></div>
-    <div class="tradingview-widget-copyright"><a href="https://www.tradingview.com/" rel="noopener nofollow" target="_blank"><span class="blue-text">Track all markets on TradingView</span></a></div>
     <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js" async>
     {
     "symbols": [
@@ -72,11 +78,12 @@ def fintech_app():
     components.html(Trading_view_ticker_tape, height=90)
     # Dictionary of famous Indian stock companies with their symbols
     stocks_with_symbols = {
+        "Apple": "AAPL",
         "Reliance Industries": "RELIANCE",
         "Tata Consultancy Services (TCS)": "TCS",
         "HDFC Bank": "HDFCBANK",
         "Infosys": "INFY",
-        "Hindustan Unilever": "HUL",
+        "Hindustan Unilever": "HINDUNILVR",
         "ICICI Bank": "ICICIBANK",
         "Bharti Airtel": "BHARTIARTL",
         "Kotak Mahindra Bank": "KOTAKBANK",
@@ -103,8 +110,39 @@ def fintech_app():
     if selected_stock:
         st.session_state.selected_stock = selected_stock
         stock_symbol = stocks_with_symbols[selected_stock]  # Retrieve the symbol for the selected stock
+        # Set stock_info here
+        stock_info = f"Information about following company: {st.session_state.selected_stock}. Strictly adhere to relevancy of the company and keep the answer short and precise."
     else:
-        stock_symbol = "NZDCAD" 
+        stock_symbol = "NZDCAD"
+        # Optionally set a default stock_info here
+        stock_info = "No stock selected"
+
+
+    st.sidebar.title("Ask Algabay AI")
+    with st.sidebar:
+        user_query = st.text_input(f"Type your question about {selected_stock}:")
+        if st.button("ask"):
+            if user_query:
+                response = ask_claude(stock_info, user_query)
+                st.write(response)
+
+
+    tradingview_info_code = f"""
+        <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js" async>
+            {{
+            "symbol": "{stock_symbol}",
+            "width": 1000,
+            "locale": "in",
+            "isTransparent": false,
+            "colorTheme": "dark"
+            }}
+            </script>
+        </div>
+    """
+    components.html(tradingview_info_code, height=200)
+
     tradingview_chart_code = f"""
         <div class="tradingview-widget-container">
             <div id="tradingview_chart_{stock_symbol}"></div>
@@ -117,6 +155,8 @@ def fintech_app():
                     "interval": "D",
                     "width": "100%",
                     "height": "400",
+                    istransparent: true,
+                    "colorTheme": "dark"
                     // Additional chart widget options
                 }}
             );
@@ -148,11 +188,25 @@ def fintech_app():
 
     # AI Assistant Interaction in the right column
     with col2:
-        st.subheader("Ask Algabay AI")
-        user_query = st.text_input(f"Type your question about {stock_symbol}:")
-        if user_query:
-            response = ask_claude(stock_info, user_query)
-            st.write(response)
+            tradingview_info = f"""
+            <div class="tradingview-widget-container">
+            <div class="tradingview-widget-container__widget"></div>
+            <script type="text/javascript" src="https://s3.tradingview.com/external-embedding/embed-widget-technical-analysis.js" async>
+            {{
+            "interval": "1m",
+            "width": 425,
+            "isTransparent": false,
+            "height": 450,
+            "symbol": "{stock_symbol}",
+            "showIntervalTabs": true,
+            "locale": "in",
+            "colorTheme": "dark"
+            }}
+            </script>
+            </div>
+            """
+            components.html(tradingview_info, height=450)
+
     
         
 
